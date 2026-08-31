@@ -8,7 +8,7 @@ class ContactListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<int>(
       valueListenable: ContactStore.instance.version,
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         final contacts = ContactStore.instance.contacts;
 
         if (contacts.isEmpty) {
@@ -20,7 +20,7 @@ class ContactListView extends StatelessWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(8),
           itemCount: contacts.length,
-          separatorBuilder: (_, __) => const Divider(),
+          separatorBuilder: (_, _) => const Divider(),
           itemBuilder: (context, index) {
             final contact = contacts[index];
             return ListTile(
@@ -34,15 +34,6 @@ class ContactListView extends StatelessWidget {
               title: Text(contact.name),
               subtitle: Text('${contact.email}\n${contact.phone}'),
               isThreeLine: true,
-              trailing: IconButton(
-                icon: Icon(
-                  contact.isFavorite ? Icons.star : Icons.star_border,
-                  color: contact.isFavorite ? Colors.amber : null,
-                ),
-                tooltip: 'Tandai favorit',
-                onPressed: () =>
-                    ContactStore.instance.toggleFavorite(contact),
-              ),
             );
           },
         );
