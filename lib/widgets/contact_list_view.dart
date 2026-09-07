@@ -25,12 +25,17 @@ class _ContactListViewState extends State<ContactListView> {
 
   void _onSearchChanged(String teks) {
     _searchController.add(teks);
+    setState(() {}); // supaya tombol clear muncul/hilang sesuai isi teks
+  }
+
+  void _clearSearch() {
+    _searchFieldController.clear();
+    _onSearchChanged('');
   }
 
   List<Contact> _filterContacts(List<Contact> contacts, String keyword) {
     final query = keyword.trim().toLowerCase();
     if (query.isEmpty) return contacts;
-
     return contacts.where((contact) {
       final nameMatch = contact.name.toLowerCase().contains(query);
       final kategoriMatch =
@@ -48,10 +53,16 @@ class _ContactListViewState extends State<ContactListView> {
           child: TextField(
             controller: _searchFieldController,
             onChanged: _onSearchChanged,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Cari nama atau kategori...',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchFieldController.text.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: _clearSearch,
+                    ),
+              border: const OutlineInputBorder(),
               isDense: true,
             ),
           ),
@@ -61,7 +72,6 @@ class _ContactListViewState extends State<ContactListView> {
             valueListenable: ContactStore.instance.version,
             builder: (context, _, __) {
               final contacts = ContactStore.instance.contacts;
-
               return StreamBuilder<String>(
                 stream: _searchController.stream,
                 initialData: '',
@@ -74,7 +84,6 @@ class _ContactListViewState extends State<ContactListView> {
                       child: Text('Belum ada kontak. Tekan tombol + untuk menambah.'),
                     );
                   }
-
                   if (filtered.isEmpty) {
                     return const Center(child: Text('Kontak tidak ditemukan.'));
                   }
@@ -87,12 +96,14 @@ class _ContactListViewState extends State<ContactListView> {
                       final contact = filtered[index];
                       return ListTile(
                         leading: CircleAvatar(
-  backgroundColor: Colors.teal,
-  child: Text(
-    contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-    style: const TextStyle(color: Colors.white),
-  ),
-),
+                          backgroundColor: Colors.teal,
+                          child: Text(
+                            contact.name.isNotEmpty
+                                ? contact.name[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
                         title: Text(contact.name),
                         subtitle: Text(
                           '${contact.email}\n${contact.phone}\n'
