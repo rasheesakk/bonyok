@@ -88,18 +88,16 @@ class _AddContactPageState extends State<AddContactPage> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  final text = value?.trim() ?? '';
-                  if (text.isEmpty) {
-                    return 'Nomor HP wajib diisi';
-                  }
-                  if (!RegExp(r'^[0-9]+$').hasMatch(text)) {
-                    return 'Nomor HP hanya boleh berisi angka';
-                  }
-                  if (text.length < 10) {
-                    return 'Nomor HP minimal 10 digit';
-                  }
-                  return null;
-                },
+  final text = value?.trim() ?? '';
+  if (text.isEmpty) {
+    return 'Email wajib diisi';
+  }
+  final emailRegex = RegExp(r'^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$');
+  if (!emailRegex.hasMatch(text)) {
+    return 'Format email tidak valid';
+  }
+  return null;
+},
               ),
               const SizedBox(height: 16),
               TextFormField(
