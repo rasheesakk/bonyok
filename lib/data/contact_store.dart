@@ -1,29 +1,40 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../models/contact.dart';
 
 class ContactStore {
-  ContactStore._internal();
-  static final ContactStore instance = ContactStore._internal();
+  static final ContactStore instance = ContactStore._();
+  ContactStore._();
 
-  final List<Contact> _contacts = [];
+  final List<Contact> _contacts = [
+    Contact(
+      name: 'rapip',
+      email: 'apip@gmail.com',
+      phone: '078553',
+      isFavorite: true, // Kontak ini hanya akan muncul di tab Favorit
+    ),
+  ];
 
-  // Berubah setiap kali data kontak berubah, dipakai untuk trigger rebuild UI.
+  // Halaman Kontak: Mengambil kontak yang BUKAN favorit
+  List<Contact> get contacts =>
+      _contacts.where((contact) => !contact.isFavorite).toList();
+
+  // Halaman Favorit: Mengambil kontak yang HANYA favorit
+  List<Contact> get favorites =>
+      _contacts.where((contact) => contact.isFavorite).toList();
+
   final ValueNotifier<int> version = ValueNotifier<int>(0);
 
-  List<Contact> get contacts => List.unmodifiable(_contacts);
-
-  List<Contact> get favorites =>
-      _contacts.where((c) => c.isFavorite).toList();
+  void notifyListeners() {
+    version.value++;
+  }
 
   void addContact(Contact contact) {
     _contacts.add(contact);
-    _notify();
+    notifyListeners();
   }
 
   void toggleFavorite(Contact contact) {
     contact.isFavorite = !contact.isFavorite;
-    _notify();
+    notifyListeners();
   }
-
-  void _notify() => version.value++;
 }

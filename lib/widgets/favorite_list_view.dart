@@ -24,7 +24,10 @@ class FavoriteListView extends StatelessWidget {
             return ListTile(
               leading: const Icon(Icons.star, color: Colors.amber),
               title: Text(contact.name),
-              subtitle: Text('${contact.email}\n${contact.phone}'),
+              subtitle: Text(
+  '${contact.email}\n${contact.phone}\n'
+  'Kategori: ${contact.kategori ?? 'Tanpa kategori'}',
+),
               isThreeLine: true,
             );
           },

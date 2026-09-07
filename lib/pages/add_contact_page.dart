@@ -14,22 +14,26 @@ class _AddContactPageState extends State<AddContactPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _kategoriController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _kategoriController.dispose();
     super.dispose();
   }
 
   void _saveContact() {
     if (_formKey.currentState!.validate()) {
+      final kategoriText = _kategoriController.text.trim();
       ContactStore.instance.addContact(
         Contact(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           phone: _phoneController.text.trim(),
+          kategori: kategoriText.isEmpty ? null : kategoriText,
         ),
       );
       Navigator.pop(context);
@@ -83,9 +87,28 @@ class _AddContactPageState extends State<AddContactPage> {
                   labelText: 'No. Handphone',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? 'Nomor HP wajib diisi'
-                    : null,
+                validator: (value) {
+                  final text = value?.trim() ?? '';
+                  if (text.isEmpty) {
+                    return 'Nomor HP wajib diisi';
+                  }
+                  if (!RegExp(r'^[0-9]+$').hasMatch(text)) {
+                    return 'Nomor HP hanya boleh berisi angka';
+                  }
+                  if (text.length < 10) {
+                    return 'Nomor HP minimal 10 digit';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _kategoriController,
+                decoration: const InputDecoration(
+                  labelText: 'Kategori (opsional)',
+                  hintText: 'Keluarga / Teman / Kerja',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
