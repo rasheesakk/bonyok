@@ -87,12 +87,12 @@ class _ContactListViewState extends State<ContactListView> {
                       final contact = filtered[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          child: Text(
-                            contact.name.isNotEmpty
-                                ? contact.name[0].toUpperCase()
-                                : '?',
-                          ),
-                        ),
+  backgroundColor: Colors.teal,
+  child: Text(
+    contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
+    style: const TextStyle(color: Colors.white),
+  ),
+),
                         title: Text(contact.name),
                         subtitle: Text(
                           '${contact.email}\n${contact.phone}\n'
