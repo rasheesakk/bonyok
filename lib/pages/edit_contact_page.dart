@@ -2,19 +2,33 @@ import 'package:flutter/material.dart';
 import '../data/contact_store.dart';
 import '../models/contact.dart';
 
-class AddContactPage extends StatefulWidget {
-  const AddContactPage({super.key});
+class EditContactPage extends StatefulWidget {
+  const EditContactPage({super.key, required this.contact});
+
+  // Kontak yang sedang diedit (referensi objek asli, bukan salinan).
+  final Contact contact;
 
   @override
-  State<AddContactPage> createState() => _AddContactPageState();
+  State<EditContactPage> createState() => _EditContactPageState();
 }
 
-class _AddContactPageState extends State<AddContactPage> {
+class _EditContactPageState extends State<EditContactPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _kategoriController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _kategoriController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Form Edit menampilkan data kontak yang sebelumnya sudah tersimpan.
+    _nameController = TextEditingController(text: widget.contact.name);
+    _emailController = TextEditingController(text: widget.contact.email);
+    _phoneController = TextEditingController(text: widget.contact.phone);
+    _kategoriController =
+        TextEditingController(text: widget.contact.kategori ?? '');
+  }
 
   @override
   void dispose() {
@@ -25,16 +39,15 @@ class _AddContactPageState extends State<AddContactPage> {
     super.dispose();
   }
 
-  void _saveContact() {
+  void _saveChanges() {
     if (_formKey.currentState!.validate()) {
       final kategoriText = _kategoriController.text.trim();
-      ContactStore.instance.addContact(
-        Contact(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: _phoneController.text.trim(),
-          kategori: kategoriText.isEmpty ? null : kategoriText,
-        ),
+      ContactStore.instance.updateContact(
+        widget.contact,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        kategori: kategoriText.isEmpty ? null : kategoriText,
       );
       Navigator.pop(context);
     }
@@ -43,7 +56,7 @@ class _AddContactPageState extends State<AddContactPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Kontak')),
+      appBar: AppBar(title: const Text('Edit Kontak')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -112,10 +125,10 @@ class _AddContactPageState extends State<AddContactPage> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _saveContact,
+                onPressed: _saveChanges,
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Text('Simpan'),
+                  child: Text('Simpan Perubahan'),
                 ),
               ),
             ],

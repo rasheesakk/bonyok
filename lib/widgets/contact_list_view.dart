@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../data/contact_store.dart';
 import '../models/contact.dart';
+import '../pages/edit_contact_page.dart';
 
 class ContactListView extends StatefulWidget {
   const ContactListView({super.key});
@@ -42,6 +43,44 @@ class _ContactListViewState extends State<ContactListView> {
           (contact.kategori ?? '').toLowerCase().contains(query);
       return nameMatch || kategoriMatch;
     }).toList();
+  }
+
+  // Membuka form Edit Kontak. Objek `contact` yang dikirim adalah
+  // referensi kontak asli (sama walau sedang berada di hasil pencarian),
+  // sehingga kontak yang benar yang akan diperbarui.
+  void _editContact(Contact contact) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditContactPage(contact: contact),
+      ),
+    );
+  }
+
+  // Menampilkan dialog konfirmasi sebelum menghapus kontak.
+  Future<void> _deleteContact(Contact contact) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Kontak'),
+        content: Text('Yakin ingin menghapus kontak "${contact.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    // Hanya hapus jika pengguna memilih "Hapus".
+    if (confirmed == true) {
+      ContactStore.instance.deleteContact(contact);
+    }
   }
 
   @override
@@ -110,6 +149,21 @@ class _ContactListViewState extends State<ContactListView> {
                           'Kategori: ${contact.kategori ?? 'Tanpa kategori'}',
                         ),
                         isThreeLine: true,
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.teal),
+                              tooltip: 'Edit',
+                              onPressed: () => _editContact(contact),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: 'Hapus',
+                              onPressed: () => _deleteContact(contact),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );

@@ -37,4 +37,30 @@ class ContactStore {
     contact.isFavorite = !contact.isFavorite;
     notifyListeners();
   }
+
+  // Memperbarui data kontak yang sudah ada.
+  // Menggunakan referensi objek `contact` (bukan index list),
+  // supaya kontak yang benar yang diperbarui walaupun sedang
+  // berada di hasil pencarian.
+  void updateContact(
+    Contact contact, {
+    required String name,
+    required String email,
+    required String phone,
+    String? kategori,
+  }) {
+    contact.name = name;
+    contact.email = email;
+    contact.phone = phone;
+    contact.kategori = kategori;
+    notifyListeners();
+  }
+
+  // Menghapus kontak dari daftar berdasarkan referensi objeknya,
+  // supaya kontak yang benar yang terhapus walaupun sedang
+  // berada di hasil pencarian.
+  void deleteContact(Contact contact) {
+    _contacts.remove(contact);
+    notifyListeners();
+  }
 }
